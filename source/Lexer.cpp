@@ -1,5 +1,4 @@
-#include "Lexer.hpp"
-#include "Message.hpp"
+#include "../include/Lexer.hpp"
 #include <fstream>
 
 Lexer::Lexer()
@@ -11,6 +10,11 @@ Lexer::Lexer()
 void Lexer::initLexer(std::vector<std::string> code)
 {
 	this->code = code;
+}
+
+TokenValue Lexer::getCurrentToken()
+{
+	return tokenValue;
 }
 
 TokenValue Lexer::getNextToken()
@@ -63,10 +67,7 @@ TokenValue Lexer::getNextToken()
 				tokenValue.value = value;
 			}
 			else
-			{
-				Message errorHandler;
-				exit(errorHandler.unrecognizedCharacter(currentLine, currentColumn, c));
-			}
+				exit(errorHandler.unrecognizedCharacter(currentLine + 1, currentColumn, c));
 			break;
 	}
 	return tokenValue;

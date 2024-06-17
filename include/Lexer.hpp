@@ -14,7 +14,7 @@ typedef enum
 	T_SLASH,
 	T_INTLIT,
 	T_EOF
-} Token;
+}	Token;
 
 /*
  * TokenValue is a struct that contains a Token and an integer value.
@@ -34,10 +34,12 @@ typedef struct
 
 #include <iostream>
 #include <vector>
+#include "ErrorHandler.hpp"
 
 class Lexer
 {
 	private:
+		ErrorHandler errorHandler;
 		int currentLine;
 		int currentColumn;
 
@@ -46,6 +48,7 @@ class Lexer
 	public:
 		Lexer();
 		void initLexer(std::vector<std::string>);
+		TokenValue getCurrentToken();
 		TokenValue getNextToken();
 };
 

@@ -5,22 +5,25 @@
 #include <fstream>
 #include <vector>
 
+#include "ErrorHandler.hpp"
 #include "Lexer.hpp"
-#include "Message.hpp"
-
-class Lexer;
-class Message;
+#include "Parser.hpp"
+#include "Interpreter.hpp"
+#include "Assembly.hpp"
 
 class Compiler
 {
 	private:
-		
+		ErrorHandler errorHandler;
 		std::string fileName;
 		std::vector<std::string> code;
 
 		Lexer lexer;
-		Message errorHandler;
+		Parser parser;
+		Interpreter interpreter;
+		Assembly assembly;
 		void readFile(std::string fileName);
+
 	public:
 		Compiler();
 		void compile(std::string fileName);

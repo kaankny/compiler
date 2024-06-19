@@ -4,6 +4,39 @@ Assembly::Assembly()
 {
 }
 
+void Assembly::freeRegisters()
+{
+	for (int i = 0; i < registers.size(); i++)
+	{
+		registers[i].second = 1;
+	}
+}
+
+int Assembly::alocateRegister()
+{
+	for (int i = 0; i < registers.size(); i++)
+	{
+		if (registers[i].second == 1)
+		{
+			registers[i].second = 0;
+			return i;
+		}
+	}
+	std::cout << "No registers available" << std::endl;
+	exit(1);
+}
+
+void Assembly::freeRegister(int reg)
+{
+	if (registers[reg].second == 0)
+		registers[reg].second = 1;
+	else
+	{
+		std::cout << "Register already free" << std::endl;
+		exit(1);
+	}
+}
+
 int Assembly::generateAssembly(ASTNode *node)
 {
 	int leftval, rightval;
@@ -16,70 +49,67 @@ int Assembly::generateAssembly(ASTNode *node)
 	switch (node->type)
 	{
 		case A_ADD:
-			return generateAdd(node);
+			return generateAdd(leftval, rightval);
 		case A_SUB:
-			return generateSub(node);
+			return generateSub(leftval, rightval);
 		case A_MUL:
-			return generateMul(node);
+			return generateMul(leftval, rightval);
 		case A_DIV:
-			return generateDiv(node);
+			return generateDiv(leftval, rightval);
 		case A_INTLIT:
-			return generateIntLit(node);
+			return generateLoad(node->intValue);
 		default:
 			exit(1);
 	}
 }
 
-int Assembly::generateAdd(ASTNode *node)
+void Assembly::generateHeader()
 {
-	outputFile << "ADD R0, R1, R2" << std::endl;
+	outputFile << "global main" << std::endl;
+	outputFile << "extern printf" << std::endl;
+	outputFile << "section .text" << std::endl;
+	outputFile << "main:" << std::endl;
+}
+
+void Assembly::generateFooter()
+{
+}
+
+int Assembly::generateLoad(int value)
+{
 	return 0;
 }
 
-int Assembly::generateSub(ASTNode *node)
+int Assembly::generateAdd(int register1, int register2)
 {
-	outputFile << "SUB R0, R1, R2" << std::endl;
 	return 0;
 }
 
-int Assembly::generateMul(ASTNode *node)
+int Assembly::generateSub(int register1, int register2)
 {
-	outputFile << "MUL R0, R1, R2" << std::endl;
 	return 0;
 }
 
-int Assembly::generateDiv(ASTNode *node)
+int Assembly::generateMul(int register1, int register2)
 {
-	outputFile << "DIV R0, R1, R2" << std::endl;
 	return 0;
 }
 
-int Assembly::generateIntLit(ASTNode *node)
+int Assembly::generateDiv(int register1, int register2)
 {
-	outputFile << "MOV R0, " << node->intValue << std::endl;
 	return 0;
 }
 
 void Assembly::generatePrintInt(int value)
 {
-	outputFile << "MOV R0, " << value << std::endl;
-	outputFile << "PRT R0" << std::endl;
-}
-
-void Assembly::generateHeader()
-{
-	outputFile << ".section .text" << std::endl;
-	outputFile << ".global _start" << std::endl;
-	outputFile << "_start:" << std::endl;
-}
-
-void Assembly::generateFooter()
-{
-	outputFile << "	MOV R7, 1" << std::endl;
-	outputFile << "	MOV R0, 0" << std::endl;
-	outputFile << "	SWI 0" << std::endl;
 }
 
 void Assembly::compile(std::string fileName)
 {
+	outputFile.open(fileName);
+
+	generateHeader();
+	generatePrintInt(42);
+	generateFooter();
+	outputFile.close();
 }

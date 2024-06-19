@@ -11,14 +11,32 @@ class Assembly
 	private:
 		std::ofstream outputFile;
 
+		/*
+		 * Registers vector
+		 * first: register name
+		 * second: register status
+		 * 0: free
+		 * 1: used
+		*/
+		std::vector<std::pair<std::string, int> > registers = {
+			{"r8", 1},
+			{"r9", 1},
+			{"r10", 1},
+			{"r11", 1}
+		};
+
+		void freeRegisters();
+		int	alocateRegister();
+		void freeRegister(int reg);
+
 		void generateHeader();
 		void generateFooter();
 
-		int generateAdd(ASTNode *node);
-		int generateSub(ASTNode *node);
-		int generateMul(ASTNode *node);
-		int generateDiv(ASTNode *node);
-		int generateIntLit(ASTNode *node);
+		int generateLoad(int value);
+		int generateAdd(int register1, int register2);
+		int generateSub(int register1, int register2);
+		int generateMul(int register1, int register2);
+		int generateDiv(int register1, int register2);
 
 		void generatePrintInt(int value);
 

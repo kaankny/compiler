@@ -12,7 +12,10 @@ typedef enum
 	T_MINUS,
 	T_STAR,
 	T_SLASH,
+	T_SEMI,
 	T_INTLIT,
+	T_PRINT,
+	T_UNKNOWN,
 	T_EOF
 }	Token;
 

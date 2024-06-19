@@ -67,7 +67,7 @@ ASTNode *Parser::parseTerm(int predenceLevel)
 	left = parsePrimary();
 
 	TokenValue token = lexer->getCurrentToken();
-	if (token.token == T_EOF)
+	if (token.token == T_SEMI)
 		return left;
 
 	while (precedence(token.token) > predenceLevel)
@@ -76,7 +76,7 @@ ASTNode *Parser::parseTerm(int predenceLevel)
 		right = parseTerm(precedence(token.token));
 		left = generateAST(getTokenASTType(token.token), left, right, 0);
 		token = lexer->getCurrentToken();
-		if (token.token == T_EOF)
+		if (token.token == T_SEMI)
 			break;
 	}
 	return left;
@@ -84,12 +84,13 @@ ASTNode *Parser::parseTerm(int predenceLevel)
 
 ASTNode *Parser::parseAddition()
 {
+	/*
 	ASTNode *left, *right;
 
 	left = parseMultiplication();
 
 	TokenValue token = lexer->getCurrentToken();
-	if (token.token == T_EOF)
+	if (token.token == T_SEMI)
 		return left;
 	
 	while (1)
@@ -98,14 +99,17 @@ ASTNode *Parser::parseAddition()
 		right = parseMultiplication();
 		left = generateAST(getTokenASTType(token.token), left, right, 0);
 		token = lexer->getCurrentToken();
-		if (token.token == T_EOF)
+		if (token.token == T_SEMI)
 			break;
 	}
 	return left;
+	*/
+	return nullptr;
 }
 
 ASTNode *Parser::parseMultiplication()
 {
+	/*
 	ASTNode *left, *right;
 
 	left = parsePrimary();
@@ -124,6 +128,8 @@ ASTNode *Parser::parseMultiplication()
 			break;
 	}
 	return left;
+	*/
+	return nullptr;
 }
 
 int Parser::precedence(Token token)
@@ -141,4 +147,17 @@ int Parser::precedence(Token token)
 		default:
 			exit(errorHandler.invalidToken(token));
 	}
+}
+
+void Parser::eatToken(Token token)
+{
+	if (lexer->getCurrentToken().token == token)
+		lexer->getNextToken();
+	else
+		exit(errorHandler.unexpectedToken(lexer->getCurrentToken().token, token));
+}
+
+Lexer *Parser::getLexer()
+{
+	return lexer;
 }

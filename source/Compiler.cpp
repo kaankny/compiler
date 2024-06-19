@@ -8,6 +8,7 @@ Compiler::Compiler()
 	this->errorHandler = ErrorHandler();
 	this->parser.setLexer(&this->lexer);
 	this->interpreter.setParser(&this->parser);
+	this->assembly.setParser(&this->parser);
 }
 
 
@@ -16,7 +17,7 @@ void Compiler::compile(std::string fileName)
 	this->readFile(fileName);
 	this->lexer.initLexer(this->code);
 	lexer.getNextToken();
-	this->interpreter.interpret();
+	//this->interpreter.interpret();
 	this->assembly.compile("output.asm");
 }
 

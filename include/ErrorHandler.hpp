@@ -49,6 +49,35 @@ class ErrorHandler
 			std::cout << C_RED << "[ Error ]" << C_RESET << C_BOLD << " Invalid token " << token << C_RESET << std::endl;
 			return 1;
 		}
+
+		int notRegisterAvailable()
+		{
+			printTime();
+			std::cout << C_RED << "[ Error ]" << C_RESET << C_BOLD << " Not registers avaible " << C_RESET << std::endl;
+			return 1;
+		}
+
+		int invalidNodeType(int type)
+		{
+			printTime();
+			std::cout << C_RED << "[ Error ]" << C_RESET << C_BOLD << " Invalid node " << type << C_RESET << std::endl;
+			return 1;
+		}
+
+		int unrecognizedKeyword(int line, int index, std::string keyword)
+		{
+			printTime();
+			std::cout << C_RED << "[ Error ]" << C_RESET << C_BOLD << " Unrecognized keyword " << keyword << " at line " << line << ", index " << index << C_RESET << std::endl;
+			return 1;
+		}
+
+		int unexpectedToken(int token, int expected)
+		{
+			printTime();
+			std::cout << C_RED << "[ Error ]" << C_RESET << C_BOLD << " Unexpected token " << token << ", expected " << expected << C_RESET << std::endl;
+			return 1;
+		}
+
 };
 
 #endif

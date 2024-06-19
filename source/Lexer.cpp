@@ -17,6 +17,19 @@ TokenValue Lexer::getCurrentToken()
 	return tokenValue;
 }
 
+Token get_keyword(std::string keyword)
+{
+	switch (keyword[0])
+	{
+		case 'p':
+			if (keyword == "print")
+				return T_PRINT;
+		default:
+			break;
+	}
+	return T_UNKNOWN;
+}
+
 TokenValue Lexer::getNextToken()
 {
 	if (code.empty())
@@ -54,6 +67,9 @@ TokenValue Lexer::getNextToken()
 		case '/':
 			tokenValue.token = T_SLASH;
 			break;
+		case ';':
+			tokenValue.token = T_SEMI;
+			break;
 		default:
 			if (c >= '0' && c <= '9')
 			{
@@ -65,6 +81,21 @@ TokenValue Lexer::getNextToken()
 				}
 				tokenValue.token = T_INTLIT;
 				tokenValue.value = value;
+				break;
+			}
+			else if (isalpha(c) || c == '_')
+			{
+				std::string identifier = "";
+				identifier += c;
+				while (currentColumn < line.length() && (isalnum(line[currentColumn]) || line[currentColumn] == '_'))
+				{
+					identifier += line[currentColumn];
+					currentColumn++;
+				}
+				tokenValue.token = get_keyword(identifier);
+				if (tokenValue.token == T_UNKNOWN)
+					exit(errorHandler.unrecognizedKeyword(currentLine + 1, currentColumn, identifier));
+				break;
 			}
 			else
 				exit(errorHandler.unrecognizedCharacter(currentLine + 1, currentColumn, c));

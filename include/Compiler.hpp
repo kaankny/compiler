@@ -24,6 +24,7 @@ class Compiler
 		Assembly assembly;
 		void readFile(std::string fileName);
 
+
 	public:
 		Compiler();
 		void compile(std::string fileName);

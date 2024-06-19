@@ -1,7 +1,13 @@
 #include "../include/Assembly.hpp"
+#include "../include/Parser.hpp"
 
 Assembly::Assembly()
 {
+}
+
+void Assembly::setParser(Parser *parser)
+{
+	this->parser = parser;
 }
 
 void Assembly::freeRegisters()
@@ -22,19 +28,13 @@ int Assembly::alocateRegister()
 			return i;
 		}
 	}
-	std::cout << "No registers available" << std::endl;
-	exit(1);
+	exit(errorHandler.notRegisterAvailable());
 }
 
 void Assembly::freeRegister(int reg)
 {
 	if (registers[reg].second == 0)
 		registers[reg].second = 1;
-	else
-	{
-		std::cout << "Register already free" << std::endl;
-		exit(1);
-	}
 }
 
 int Assembly::generateAssembly(ASTNode *node)
@@ -59,57 +59,110 @@ int Assembly::generateAssembly(ASTNode *node)
 		case A_INTLIT:
 			return generateLoad(node->intValue);
 		default:
-			exit(1);
+			exit(errorHandler.invalidNodeType(node->type));
 	}
 }
 
 void Assembly::generateHeader()
 {
 	outputFile << "global main" << std::endl;
-	outputFile << "extern printf" << std::endl;
-	outputFile << "section .text" << std::endl;
+	outputFile << "extern printf\n" << std::endl;
+	outputFile << "section .text\n" << std::endl;
 	outputFile << "main:" << std::endl;
+	outputFile << "	sub rsp, 60" << std::endl;
+	outputFile << std::endl;
 }
 
 void Assembly::generateFooter()
 {
+	outputFile << "	add rsp, 60" << std::endl;
+	outputFile << "	ret" << std::endl;
+	outputFile << std::endl;
+	outputFile << "section .data" << std::endl;
+	outputFile << "	format db \"%d\", 10, 0" << std::endl;
+	outputFile << std::endl;
 }
 
 int Assembly::generateLoad(int value)
 {
-	return 0;
+	int reg = alocateRegister();
+	outputFile << "	mov " << registers[reg].first << ", " << value << std::endl;
+	outputFile << std::endl;
+	return reg;
 }
 
 int Assembly::generateAdd(int register1, int register2)
 {
-	return 0;
+	outputFile << "	add " << registers[register1].first << ", " << registers[register2].first << std::endl;
+	outputFile << std::endl;
+	freeRegister(register2);
+	return register1;
 }
 
 int Assembly::generateSub(int register1, int register2)
 {
-	return 0;
+	outputFile << "	sub " << registers[register1].first << ", " << registers[register2].first << std::endl;
+	outputFile << std::endl;
+	freeRegister(register2);
+	return register1;
 }
 
 int Assembly::generateMul(int register1, int register2)
 {
-	return 0;
+	outputFile << "	imul " << registers[register1].first << ", " << registers[register2].first << std::endl;
+	outputFile << std::endl;
+	freeRegister(register2);
+	return register1;
 }
 
 int Assembly::generateDiv(int register1, int register2)
 {
-	return 0;
+	outputFile << "	mov rax, " << registers[register1].first << std::endl;
+	outputFile << "	cqo" << std::endl;
+	outputFile << "	idiv " << registers[register2].first << std::endl;
+	outputFile << "	mov " << registers[register1].first << ", rax" << std::endl;
+	outputFile << std::endl;
+	freeRegister(register2);
+	return register1;
 }
 
 void Assembly::generatePrintInt(int value)
 {
+	outputFile << "	lea rcx, [rel format]" << std::endl;
+	outputFile << "	mov rdx, " << registers[value].first << std::endl;
+	outputFile << "	call printf" << std::endl;
+	outputFile << std::endl;
+	freeRegister(value);
 }
 
 void Assembly::compile(std::string fileName)
 {
+	int reg;
 	outputFile.open(fileName);
 
 	generateHeader();
-	generatePrintInt(42);
+	handleStatement();
 	generateFooter();
 	outputFile.close();
+
+	system("nasm -o output.obj -fwin64 output.asm");
+	system("gcc -m64 output.obj -o a.exe");
+}
+
+void Assembly::handleStatement()
+{
+	ASTNode *tree;
+	int reg;
+
+	while (1)
+	{
+		this->parser->eatToken(T_PRINT);
+		tree = this->parser->parseTerm(0);
+		reg = generateAssembly(tree);
+		generatePrintInt(reg);
+		freeRegisters();
+		this->parser->eatToken(T_SEMI);
+		if (this->parser->getLexer()->getCurrentToken().token == T_EOF)
+			return ;
+	}
 }

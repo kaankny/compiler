@@ -5,10 +5,13 @@
 #include <fstream>
 #include <vector>
 #include "Parser.hpp"
+#include "ErrorHandler.hpp"
 
 class Assembly
 {
 	private:
+		Parser *parser;
+		ErrorHandler errorHandler;
 		std::ofstream outputFile;
 
 		/*
@@ -39,9 +42,13 @@ class Assembly
 		int generateDiv(int register1, int register2);
 
 		void generatePrintInt(int value);
+		void handleStatement();
+
+
 
 	public:
 		Assembly();
+		void setParser(Parser *parser);
 		int generateAssembly(ASTNode *node);
 
 		void compile(std::string fileName);

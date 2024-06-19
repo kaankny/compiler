@@ -62,6 +62,10 @@ class Parser
 		ASTNode *parseAddition();
 		ASTNode *parseMultiplication();
 		void setLexer(Lexer *lexer);
+
+		void eatToken(Token token);
+
+		Lexer *getLexer();
 };
 
 #endif
